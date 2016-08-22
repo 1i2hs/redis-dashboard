@@ -1,0 +1,28 @@
+{
+  "name": "cf-redis-cloud",
+  "description": "admin for cloud foundry redis cloud",
+  "main": "app.js",
+  "authors": [
+    "XEiN"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "web",
+    "application",
+    "imp",
+    "express",
+    "nodejs"
+  ],
+  "homepage": "https://github.com/oneitwoh/cf-redis-cloud-dashboard",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "handlebars": "^4.0.5"
+  },
+  "directory" : "views/bower_components"
+}

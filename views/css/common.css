@@ -1,0 +1,274 @@
+/* global */
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+.margin-top-default {
+    margin-top: 20px;
+}
+
+.margin-top-sm {
+    margin-top: 10px;
+}
+
+li[selected~="selected"],
+tr[selected~="selected"] {
+    background-color: rgb(234, 243, 254);
+}
+
+/*#page-main-left-column > .panel > .panel-body > ul > li[selected~="selected"],
+#page-main-right-column > .panel.panel-default > div.table-responsive > table.table.table-hover > tbody > tr[selected~="selected"] {
+    color: white;
+}*/
+
+/* title part */
+@media (min-width: 768px) {
+    #alert-key-event {
+        top: 40px;
+        right: 20px;
+    }
+}
+
+@media (max-width: 767px) {
+    #alert-key-event {
+        top: 40px;
+        left: 10px;
+        right: 10px;
+    }
+
+    #page-main-right-column {
+        margin-top: 20px;
+    }
+}
+
+#alert-key-event {
+    position: fixed;
+    z-index: 1030;
+}
+
+#page-title {
+    padding-top: 8px;
+}
+
+#page-title > div.col-xs-12 > h2 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+#db-name {
+    font-weight: bold;
+}
+
+/****** main part ******/
+/* for index.html */
+#page-main {
+    position: relative;
+}
+#page-main-left-column > .panel.panel-default.margin-top-sm > .panel-footer {
+    text-align: right;
+}
+
+#page-main-left-column > .panel {
+    margin-bottom: 0px;
+}
+
+#page-main-left-column > .panel > .panel-body {
+    padding : 0px;
+    overflow-y: auto;
+}
+
+#page-main-left-column > .panel > .panel-body > ul {
+    list-style-type: none;
+    padding: 0px;
+}
+
+#page-main-left-column > .panel > .panel-body > ul > li {
+    list-style-type: none;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+#page-main-left-column > .panel > .panel-body > ul > li > a {
+    color: black;
+}
+
+#modal-add-key > .modal-dialog > .modal-content > .modal-body > .section-key {
+    margin-bottom: 10px;
+}
+
+#modal-add-key > .modal-dialog > .modal-content > .text-error-message {
+    text-align: right;
+    margin-right: 15px;
+    margin-bottom: 15px;
+}
+
+/*#modal-add-key > .modal-dialog > .modal-content > .modal-body > .section-value > div > .btn-value-mgmt > button,
+#modal-add-key > .modal-dialog > .modal-content > .modal-body > .section-value > .btn-save-hash {
+    display: none;
+}*/
+
+.text-error-message {
+    color: red;
+}
+
+li.key {
+    word-wrap: break-word;
+}
+
+/* for db_info.html */
+h3.db-info-page-title {
+    font-weight: bold;
+}
+
+.panel-first-row > div > .panel.panel-default > .panel-body > .text-primary,
+.panel-second-row > .panel-body > .text-primary {
+    font-weight: bold;
+    float: right;
+    margin-top: 10px;
+    font-size: x-large;
+    color: black;
+}
+
+/* for key_info_header.html */
+#page-main-right-column {
+    position: relative;
+}
+
+.btn-group-key-name {
+    display: inline;
+    font-weight: bold;
+    word-wrap: break-word;
+}
+
+.btn-group-key-name > .btn-edit-key-name {
+    margin-left: 5px
+}
+
+.btn-group-key-info-mgmt {
+    float: right;
+}
+
+.input-group-ttl-mgmt > input.form-control {
+    text-align: right;
+}
+
+.input-group-ttl-mgmt > span {
+    margin-left: 10px;
+}
+
+.btn-group-key-row-mgmt {
+    float: right;
+}
+
+/* string type data의 상세정보 페이지에서 row 추가/삭제(+/-) 버튼과 하단의 save 버튼 숨기기 */
+#page-main-right-column.string-type > div.section-header > div.row.margin-top-sm > div.col-sm-4.col-xs-12 > div.btn-group-key-row-mgmt,
+#page-main-right-column.string-type > div.section-header > div.margin-top-sm.section-value > div > div.btn-value-mgmt > button.btn.btn-primary.btn-sm {
+    display: none;
+}
+
+/* for table related html */
+.table-key-list > .table-scroll,
+.table-key-sorted-set > .table-scroll,
+.table-key-hash > .table-scroll {
+    max-height: 190px;
+    overflow: auto;
+}
+
+.table-key-list > .table-scroll > table,
+.table-key-sorted-set > .table-scroll > table,
+.table-key-hash > .table-scroll > table {
+    margin-bottom: 0px;
+}
+
+.table-key-list > .panel-footer,
+.table-key-set > .panel-footer,
+.table-key-sorted-set > .panel-footer,
+.table-key-hash > .panel-footer {
+    text-align: right;
+}
+
+/*.table-key-list > table > tbody > tr > td,
+.table-key-set > table > tbody > tr > td,
+.table-key-sorted-set > table > tbody > tr > td
+.table-key-hash > table > tbody > tr > td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}*/
+
+/* for key_info_string_type_value_input.html */
+.btn-value-mgmt {
+    float: right;
+}
+
+/* for key_info_sorted_set_type_value_input.html */
+.input-group-score-mgmt > input {
+    text-align: right;
+}
+
+/* for key_info_hash_type_value_input.xml */
+.section-value > .btn-save-hash {
+    text-align: right;
+}
+
+/* for adding a new key modal */
+.section-value > div:first-child > .dropdown {
+    float: right;
+}
+
+.section-key > label,
+.section-data-type > label,
+.section-value > div > label {
+    line-height: 1.5;
+    padding-top: 10px;
+    margin-bottom: 0px;
+}
+
+/****** page bottom ******/
+#well-system-log {
+    overflow: auto;
+    height: 150px;
+}
+
+tr.deleted {
+    display: none;
+}
+
+.modal-footer > .glyphicon-refresh.small-progress {
+    margin-left: 5px;
+}
+
+#message-no-result {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200px;
+    height: 200px;
+    margin: -100px 0 0 -100px;
+    text-align: center;
+}
+
+#progressbar-indeterminate {
+    position: absolute;
+    z-index:1023;
+}
+
+#progressbar-indeterminate > div.progressbar-content {
+    margin-top: 200px;
+    top: 50%;
+    text-align: center;
+}
+
+#progressbar-indeterminate > div.progressbar-content > span,
+.modal-footer > .glyphicon-refresh.small-progress {
+    -webkit-animation:spin 4s linear infinite;
+    -moz-animation:spin 4s linear infinite;
+    animation:spin 4s linear infinite;
+}
+
+@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }

@@ -1,0 +1,350 @@
+<!-- DB info template-->
+<script id="db-info-template" type="text/x-handlebars-template">
+    <h3 class="db-info-page-title">DB info.</h3>
+    <div class="row margin-top-default panel-first-row">
+        <div class="col-xs-12 col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class>Total Keys</div>
+                    <div id="total-keys" class="text-primary">{{numKeys}}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-6">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div>Connections</div>
+                    <div id="connection-info" class="text-primary">{{numConnections}}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="panel panel-default panel-second-row">
+        <div class="panel-body">
+            <div>Used Memory</div>
+            <div id="memory-info" class="text-primary">{{usedMemory}}</div>
+        </div>
+    </div>
+</script>
+<!-- end of DB info template-->
+
+<!-- progress bar template -->
+<script id="loading-progress-bar-template" type="text/x-handlebars-template">
+    <div id="progressbar-indeterminate" style="height: {{loadingTemplateHeight}}px; width: {{backgroundWidth}}px;">
+        <div class="progressbar-content">
+            <span class="glyphicon glyphicon-refresh" style="font-size: 100px;"></span>
+            <p class="progress-message margin-top-default">{{message}}</p>
+        </div>
+    </div>
+</script>
+<!-- end of progress bar template -->
+
+<!-- no result placeholder template -->
+<script id="no-result-placeholder-template" type="text/x-handlebars-template">
+    <div style="height: {{templateHeight}}px">
+        <div id="message-no-result">
+            <span class="glyphicon glyphicon-remove" style="font-size: 100px;\"></span>
+            <p>No keys found for the word: {{keyword}}</p>
+        </div>
+    </div>
+</script>
+<!-- end of no result placeholder template -->
+
+<!-- key list template -->
+<script id="key-selection-template" type="text/x-handlebars-template">
+    <li class="key" id="{{id}}">{{key}}</li>
+</script>
+<!-- end of key list template-->
+
+<!-- key info header template -->
+<script id="key-info-header-template" type="text/x-handlebars-template">
+    <div class="section-header">
+        <div class="row">
+            <div class="col-xs-12" style="margin-bottom: 10px"><h5 style="font-size: 15px"><span id="label-data-type" class="label {{dataTypeLabelClass}}">{{dataType}}</span></h5></div>
+            <div class="col-sm-9 col-xs-12">
+                <h3 class="btn-group-key-name" style="width: inherit">
+                    {{key}} 
+                    <button class="btn btn-default btn-sm btn-edit-key-name" type="button">
+                        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+                    </button>
+                </h3>
+            </div>
+
+            <div class="col-sm-3 col-xs-12">
+                <div class=btn-group-key-info-mgmt>
+                    <button class="btn btn-default btn-sm btn-refresh-key-info" type="button">
+                                    <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                                </button>
+                    <button class="btn btn-primary btn-sm btn-save-key" type="button">Save</button>
+                    <button class="btn btn-danger btn-sm btn-delete-key" type="button">Delete</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row margin-top-sm">
+            <div class="col-sm-4 col-xs-12">
+                <div class="input-group input-group-ttl-mgmt">
+                    <span class="input-group-addon">TTL value</span>
+                    <input type="text" class="form-control" value="{{ttl}}">
+                    </span>
+                </div>
+            </div>
+            <div class="col-sm-4 col-xs-12">
+            </div>
+            <div class="col-sm-4 col-xs-12">
+                <div class="btn-group-key-row-mgmt">
+                    <button type="button" id="btn-add-row" class="btn btn-default btn-sm">
+                                    <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                                </button>
+                    <button type="button" id="btn-delete-row" class="btn btn-default btn-sm">
+                                    <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+                                </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+<!-- end of key info header template -->
+
+<!-- key name editor template -->
+<script id="key-name-editor-template" type="text/x-handlebars-template">
+    <input type="text" id="input-key-name" class="form-control" value="{{key}}" style="display: inline-block; width: inherit">
+    <button id="btn-edit-key-name" class="btn btn-default btn-sm" type="button"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></button>
+</script>
+
+<script id="key-name-template" type="text/x-handlebars-template">
+    {{key}} 
+    <button class="btn btn-default btn-sm btn-edit-key-name" type="button">
+        <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+    </button>        
+</script>
+<!-- end of key name editor template -->
+
+<!-- table templates -->
+<script id="simple-table-template" type="text/x-handlebars-template">
+    <div class="panel panel-default table-key-list margin-top-default section-table">
+        <div class="table-scroll">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Row</th>
+                        <th>Value</th>
+                        <th>State</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each rows}}
+                    <tr>
+                        <td>
+                            {{rowNum}}
+                        </td>
+                        <td class="redis-value">
+                            {{value}}
+                        </td>
+                        <td class="redis-value-state">
+                        </td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+        <div class="panel-footer">{{size}}</div>
+    </div>
+</script>
+
+<script id="sorted-set-table-template" type="text/x-handlebars-template">
+    <div class="panel panel-default table-key-sorted-set margin-top-default section-table">
+        <div class="table-scroll">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Row</th>
+                        <th>Value</th>
+                        <th>Score</th>
+                        <th>State</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each rows}}
+                    <tr>
+                        <td>
+                            {{rowNum}}
+                        </td>
+                        <td class="redis-value">
+                            {{value}}
+                        </td>
+                        <td class="redis-score">
+                            {{score}}
+                        </td>
+                        <td class="redis-value-state">
+                        </td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+        <div class="panel-footer">{{size}}</div>
+    </div>
+</script>
+
+<script id="hash-table-template" type="text/x-handlebars-template">
+    <div class="panel panel-default table-key-hash margin-top-default section-table">
+        <div class="table-scroll">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Row</th>
+                        <th>Field</th>
+                        <th>Value</th>
+                        <th>State</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each rows}}
+                    <tr>
+                        <td>
+                            {{rowNum}}
+                        </td>
+                        <td class="redis-hash-field">
+                            {{field}}
+                        </td>
+                        <td class="redis-hash-value">
+                            {{value}}
+                        </td>
+                        <td class="redis-value-state">
+                        </td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+        </div>
+        <div class="panel-footer">{{size}}</div>
+    </div>
+</script>
+
+<script id="common-row-template" type="text/x-handlebars-template">
+    <tr>
+        <td>{{rowIndex}}</td>
+        <td class="redis-value"></td>
+        <td class="redis-value-state">added</td>
+    </tr>
+</script>
+
+<script id="sorted-set-row-template" type="text/x-handlebars-template">
+    <tr>
+        <td>{{rowIndex}}</td>
+        <td class="redis-value"></td>
+        <td class="redis-score"></td>
+        <td class="redis-value-state">added</td>
+    </tr>
+</script>
+
+<script id="hash-row-template" type="text/x-handlebars-template">
+    <tr>
+        <td>{{rowIndex}}</td>
+        <td class="redis-hash-field"></td>
+        <td class="redis-hash-value"></td>
+        <td class="redis-value-state">added</td>
+    </tr>
+</script>
+
+<!-- end of table templates -->
+
+<!-- value input templates -->
+<script id="simple-value-input-template" type="text/x-handlebars-template">
+    <div class="margin-top-sm section-value">
+        <!--Can be change to Key/Value-->
+        <div>
+            <label>{{label}}</label>
+            <div class="btn-value-mgmt">
+                <span class="dropdown">
+                <button class="btn btn-default btn-sm btn-change-value-view dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Plain Text<span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#">Plain Text</a></li>
+                    <li><a href="#">JSON</a></li>
+                </ul>
+                </span>
+            </div>
+        </div>
+        <div class="margin-top-sm">
+            <textarea class="form-control textarea-value" rows="13" disabled>{{value}}</textarea>
+        </div>
+    </div>
+</script>
+
+<script id="sorted-set-value-input-template" type="text/x-handlebars-template">
+    <div class="margin-top-sm section-value">
+        <!--Can be change to Key/Value-->
+        <div>
+            <label>{{label}}</label>
+            <div class="btn-value-mgmt">
+                <span class="dropdown">
+                <button class="btn btn-default btn-sm btn-change-value-view dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Plain Text<span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a href="#">Plain Text</a></li>
+                    <li><a href="#">JSON</a></li>
+                </ul>
+                </span>
+            </div>
+        </div>
+        <div class="margin-top-sm">
+            <textarea class="form-control textarea-value" rows="13" disabled>{{value}}</textarea>
+        </div>
+
+        <div class="input-group margin-top-sm input-group-score-mgmt">
+            <span class="input-group-addon">Score</span>
+            <input type="text" class="form-control" value="{{score}}" disabled>
+        </div>
+    </div>
+    
+</script>
+
+<script id="hash-value-input-template" type="text/x-handlebars-template">
+    <div class="margin-top-sm section-value">
+    <!--<div class="btn-save-hash">
+        <button class="btn btn-primary btn-sm" type="button">Save</button>
+    </div>-->
+        <div class="margin-top-sm">
+            <label>Field</label>
+            <div class="btn-value-mgmt">
+                <span class="dropdown">
+                <button class="btn btn-default btn-sm btn-change-value-view dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Plain Text<span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-hash-field">
+                    <li><a href="#">Plain Text</a></li>
+                    <li><a href="#">JSON</a></li>
+                </ul>
+                </span>
+
+            </div>
+        </div>
+        <div class="margin-top-sm">
+            <textarea class="form-control textarea-hash-field" rows="5" disabled></textarea>
+        </div>
+
+        <div class="margin-top-sm">
+            <label>Value</label>
+            <div class="btn-value-mgmt">
+                <span class="dropdown">
+                <button class="btn btn-default btn-sm btn-change-value-view dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Plain Text<span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-hash-value">
+                    <li><a href="#">Plain Text</a></li>
+                    <li><a href="#">JSON</a></li>
+                </ul>
+                </span>
+            </div>
+        </div>
+        <div class="margin-top-sm">
+            <textarea class="form-control textarea-hash-value" rows="10" disabled></textarea>
+        </div>
+    </div>
+</script>
+<!-- end of input templates-->

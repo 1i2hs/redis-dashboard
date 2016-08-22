@@ -1,0 +1,29 @@
+<script src="@{js}/leftColumnView.js"></script>
+<div class="col-sm-3 col-xs-12" id="page-main-left-column">
+    <div class="input-group">
+        <input id="input-search-key" type="text" placeholder="Search keys" class="form-control">
+        <span class="input-group-btn">
+                    <button id="btn-search-key" class="btn btn-default" type="button">
+                        <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+        </button>
+        </span>
+    </div>
+
+    <button id="btn-add-key" type="button" class="btn btn-primary btn-sm margin-top-sm" data-toggle="modal" data-target=".add-key-modal">
+        Add key
+    </button>
+
+    <button id="btn-refresh-key-list" type="button" class="btn btn-default btn-sm margin-top-sm">
+                    <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+                </button>
+
+    <div class="panel panel-default margin-top-sm">
+        <div class="panel-body">
+            <ul>
+            </ul>
+        </div>
+
+        <div class="panel-footer">0 keys</div>
+
+    </div>
+</div>
