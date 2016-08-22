@@ -85,19 +85,14 @@ var credential = {};
 
 $(document).ready(function () {
     /* constants */
-    const PAGE_MAIN_RIGHT_COLUMN = '#page-main-right-column';
     const PAGE_TITLE_HEIGHT = $('#page-title').height();
     const FILTER_INPUT_HEIGHT = $('#page-main-left-column > .input-group').height();
     const ADD_KEY_BUTTON_HEIGHT = $('#page-main-left-column > button.btn.btn-primary').height();
     const KEY_LIST_FOOTER_HEIGHT = $('#page-main-left-column > .panel > .panel-footer').height();
     const MIN_KEY_LIST_PANEL_HEIGHT = $(window).height() - (PAGE_TITLE_HEIGHT
         + FILTER_INPUT_HEIGHT + ADD_KEY_BUTTON_HEIGHT + KEY_LIST_FOOTER_HEIGHT + 140); // total margins used in left column === 140
-    const LOADING_TEMPLATE_HEIGHT = $(window).height() - (PAGE_TITLE_HEIGHT + 80);
-
-    // var adjustMainRightColumnHeight = function () {
-    //     $(PAGE_MAIN_RIGHT_COLUMN).height($('#page-main-left-column').height());
-    // }
-
+    
+    $('#alert-key-event').css("right", $(".container").css("margin-right"));
     $('#alert-key-event').hide();
 
     /* clicking title("Redis Dashboard") at the top of the page */

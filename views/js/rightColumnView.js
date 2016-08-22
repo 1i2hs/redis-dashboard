@@ -236,6 +236,8 @@ var showKeyInfo = function (keyInfo) {
     selectedKey.setRows(null);
 
     changeHtmlTemplate(keyInfo);
+
+    adjustInputHeight(keyInfo.dataType);
 }
 
 var changeHtmlTemplate = function (keyInfo) {
@@ -697,10 +699,15 @@ var addRow = function () {
     $newRowJQueryObject.on("click", function (event) {
         selectRow($(this));
     });
+
+    scrollTableToBottom();
+}
+
+var scrollTableToBottom = function () {
+    $('.table-scroll').scrollTop($('.table-scroll').prop("scrollHeight"));
 }
 
 var deleteRow = function () {
-    console.log(selectedKey.getRows());
     var $tableBodyJQueryObject = $('#page-main-right-column > .panel.panel-default > .table-scroll > table > tbody');
     var $tableFooterJQueryObject = $('#page-main-right-column > .panel.panel-default > .panel-footer');
 
@@ -713,20 +720,19 @@ var deleteRow = function () {
     // get currently selected row and its element JQueryObject
     var selectedRow = selectedKey.getCurrentRow();
     var selectedRowIndex = selectedRow.getIndex();
-    var targetElement = selectedRow.getTargetElement();
+    var currentRowJqueryObject = selectedRow.getTargetElement();
+
+    // get previous row JqueryObject to automatically select it after deletion of current row
+    var previousRowElement = currentRowJqueryObject.prev();
 
     // remove row object from selectedKey object
     selectedKey.setCurrentRow(null);
-
-    console.log(selectedRowIndex);
 
     // remove row object from the rows array
     var row = selectedKey.getRow(selectedRowIndex);
     if (row.getStatus() == ROW_ADDED) {
         selectedKey.getRows().splice(selectedRowIndex, 1);
-        console.log("AFTER");
-        console.log(selectedKey.getRows());
-        targetElement.remove();
+        currentRowJqueryObject.remove();
 
         for (var i = selectedRowIndex; i < selectedKey.getRows().length; i++) {
             selectedKey.getRow(i).setIndex(i);
@@ -735,30 +741,35 @@ var deleteRow = function () {
         row.setStatus(ROW_DELETED);
 
         // remove row element from the table
-        targetElement.addClass("deleted");
-        targetElement.attr("selected", null);;
-        targetElement.unbind("click");
+        currentRowJqueryObject.addClass("deleted");
+        currentRowJqueryObject.attr("selected", null);;
+        currentRowJqueryObject.unbind("click");
+    }
 
-        // clear inputs
-        switch (selectedKey.getDataType()) {
-            case "list":
-            case "set":
-                $('textarea.textarea-value').unbind("keyup");
-                $('textarea.textarea-value').val("");
-                break;
-            case "zset":
-                $('textarea.textarea-value').unbind("keyup");
-                $('textarea.textarea-value').val("");
-                $('div.input-group-score-mgmt > input.form-control').val("");
-                $('div.input-group-score-mgmt > input.form-control').unbind("keyup");
-                break;
-            case "hash":
-                $('textarea.textarea-hash-field').unbind("keyup");
-                $('textarea.textarea-hash-field').val("");
-                $('textarea.textarea-hash-value').unbind("keyup");
-                $('textarea.textarea-hash-value').val("");
-                break;
-        }
+    // clear inputs
+    switch (selectedKey.getDataType()) {
+        case "list":
+        case "set":
+            $('textarea.textarea-value').unbind("keyup");
+            $('textarea.textarea-value').val("");
+            $('textarea.textarea-value').prop('disabled', true);
+            break;
+        case "zset":
+            $('textarea.textarea-value').unbind("keyup");
+            $('textarea.textarea-value').val("");
+            $('textarea.textarea-value').prop('disabled', true);
+            $('div.input-group-score-mgmt > input.form-control').val("");
+            $('div.input-group-score-mgmt > input.form-control').unbind("keyup");
+            $('div.input-group-score-mgmt > input.form-control').prop('disabled', true);
+            break;
+        case "hash":
+            $('textarea.textarea-hash-field').unbind("keyup");
+            $('textarea.textarea-hash-field').val("");
+            $('textarea.textarea-hash-field').prop('disabled', true);
+            $('textarea.textarea-hash-value').unbind("keyup");
+            $('textarea.textarea-hash-value').val("");
+            $('textarea.textarea-hash-value').prop('disabled', true);
+            break;
     }
 
     // update row numbers of the table
@@ -771,6 +782,8 @@ var deleteRow = function () {
     });
 
     $tableFooterJQueryObject.text("Size: " + rowCounter);
+
+    selectRow(previousRowElement);
 }
 
 var createModifiedKeyObject = function () {
@@ -885,4 +898,40 @@ var createModifiedKeyObject = function () {
     }
 
     return modifiedKeyInfo;
+}
+
+var adjustInputHeight = function (dataType) {
+    var rightColumnDefaultHeight = $('#page-main-left-column').height();
+    console.log(rightColumnDefaultHeight);
+
+    var rightColumnHeaderHeight = $('.section-header').height();
+    console.log(rightColumnHeaderHeight);
+
+    var valueInputLabelHeight = $('.section-value > div.label-input-value').height();
+
+    var tableHeight;
+
+    if (dataType !== "string") {
+        tableHeight = $('.section-table').height();
+    }
+
+    // the hard coded numbers shown below are margin values
+    switch (dataType) {
+        case "string":
+            $('.section-value > div > .form-control.textarea-value').height(rightColumnDefaultHeight - rightColumnHeaderHeight - valueInputLabelHeight - 33);
+            break;
+        case "list":
+        case "set":
+            $('.section-value > div > .form-control.textarea-value').height(rightColumnDefaultHeight - rightColumnHeaderHeight - tableHeight - valueInputLabelHeight - 65);
+            break;
+        case "zset":
+            var scoreInputHeight = $('.input-group-score-mgmt').height();
+            $('.section-value > div > .form-control.textarea-value').height(rightColumnDefaultHeight - rightColumnHeaderHeight - tableHeight - valueInputLabelHeight - scoreInputHeight - 75);
+            break;
+        case "hash":
+            var fieldInputLabelHeight = $('.section-value > div.label-input-field').height();
+            var fieldInputHeight = $('.section-value > div.label-input-field').next().height();
+            $('textarea.form-control.textarea-hash-value').height(rightColumnDefaultHeight - rightColumnHeaderHeight - tableHeight - fieldInputLabelHeight - fieldInputHeight - valueInputLabelHeight - 85);
+            break;
+    }
 }

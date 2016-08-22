@@ -25,14 +25,13 @@ tr[selected~="selected"] {
 /* title part */
 @media (min-width: 768px) {
     #alert-key-event {
-        top: 40px;
-        right: 20px;
+        top: 15px;
     }
 }
 
 @media (max-width: 767px) {
     #alert-key-event {
-        top: 40px;
+        top: 15px;
         left: 10px;
         right: 10px;
     }
@@ -116,6 +115,7 @@ tr[selected~="selected"] {
 
 li.key {
     word-wrap: break-word;
+    cursor: default;
 }
 
 /* for db_info.html */
@@ -188,6 +188,18 @@ h3.db-info-page-title {
 .table-key-sorted-set > .panel-footer,
 .table-key-hash > .panel-footer {
     text-align: right;
+}
+
+table > thead > tr > th {
+    text-align: center;
+}
+
+td {
+    max-width: 1px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
 }
 
 /*.table-key-list > table > tbody > tr > td,

@@ -128,9 +128,9 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>Row</th>
-                        <th>Value</th>
-                        <th>State</th>
+                        <th class="col-md-1">Row</th>
+                        <th class="col-md-8">Value</th>
+                        <th class="col-md-3">State</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -159,10 +159,10 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>Row</th>
-                        <th>Value</th>
-                        <th>Score</th>
-                        <th>State</th>
+                        <th class="col-md-1">Row</th>
+                        <th class="col-md-7">Value</th>
+                        <th class="col-md-2">Score</th>
+                        <th class="col-md-2">State</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -194,10 +194,10 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>Row</th>
-                        <th>Field</th>
-                        <th>Value</th>
-                        <th>State</th>
+                        <th class="col-md-1">Row</th>
+                        <th class="col-md-4">Field</th>
+                        <th class="col-md-4">Value</th>
+                        <th class="col-md-3">State</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -255,7 +255,7 @@
 <script id="simple-value-input-template" type="text/x-handlebars-template">
     <div class="margin-top-sm section-value">
         <!--Can be change to Key/Value-->
-        <div>
+        <div class="label-input-value">
             <label>{{label}}</label>
             <div class="btn-value-mgmt">
                 <span class="dropdown">
@@ -278,7 +278,7 @@
 <script id="sorted-set-value-input-template" type="text/x-handlebars-template">
     <div class="margin-top-sm section-value">
         <!--Can be change to Key/Value-->
-        <div>
+        <div class="label-input-value">
             <label>{{label}}</label>
             <div class="btn-value-mgmt">
                 <span class="dropdown">
@@ -309,7 +309,7 @@
     <!--<div class="btn-save-hash">
         <button class="btn btn-primary btn-sm" type="button">Save</button>
     </div>-->
-        <div class="margin-top-sm">
+        <div class="margin-top-sm label-input-field">
             <label>Field</label>
             <div class="btn-value-mgmt">
                 <span class="dropdown">
@@ -325,10 +325,10 @@
             </div>
         </div>
         <div class="margin-top-sm">
-            <textarea class="form-control textarea-hash-field" rows="5" disabled></textarea>
+            <textarea class="form-control textarea-hash-field" rows="3" disabled></textarea>
         </div>
 
-        <div class="margin-top-sm">
+        <div class="margin-top-sm label-input-value">
             <label>Value</label>
             <div class="btn-value-mgmt">
                 <span class="dropdown">
@@ -343,7 +343,7 @@
             </div>
         </div>
         <div class="margin-top-sm">
-            <textarea class="form-control textarea-hash-value" rows="10" disabled></textarea>
+            <textarea class="form-control textarea-hash-value" disabled></textarea>
         </div>
     </div>
 </script>

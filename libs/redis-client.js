@@ -86,6 +86,7 @@ module.exports = (function () {
     };
 
     RedisClient.prototype.getDbInfo = function () {
+        console.log(this.client.server_info);
         return [this.client.server_info.db0.keys, this.client.server_info.connected_clients, this.client.server_info.used_memory_human];
     };
 
