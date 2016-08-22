@@ -663,6 +663,7 @@ var addRow = function () {
     rowIndex = rowIndex - deletedCellCounter;
 
     row.setIndex(rowIndex - 1);
+    console.log(rowIndex - 1);
     row.setStatus(ROW_NO_CHANGE);
 
     switch (selectedKey.getDataType()) {
@@ -696,9 +697,6 @@ var addRow = function () {
     $newRowJQueryObject.on("click", function (event) {
         selectRow($(this));
     });
-
-    console.log("ADDED");
-    console.log(selectedKey.getRows());
 }
 
 var deleteRow = function () {
@@ -720,16 +718,19 @@ var deleteRow = function () {
     // remove row object from selectedKey object
     selectedKey.setCurrentRow(null);
 
-    console.log("BEFORE");
-    console.log(selectedKey.getRows());
+    console.log(selectedRowIndex);
 
     // remove row object from the rows array
     var row = selectedKey.getRow(selectedRowIndex);
     if (row.getStatus() == ROW_ADDED) {
         selectedKey.getRows().splice(selectedRowIndex, 1);
-         console.log("AFTER");
+        console.log("AFTER");
         console.log(selectedKey.getRows());
         targetElement.remove();
+
+        for (var i = selectedRowIndex; i < selectedKey.getRows().length; i++) {
+            selectedKey.getRow(i).setIndex(i);
+        }
     } else {
         row.setStatus(ROW_DELETED);
 

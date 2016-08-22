@@ -1,6 +1,6 @@
 ---
 applications:
-- name: cf-redis-cloud
+- name: redis-dashboard
   command: node app.js
   buildpack: nodejs_buildpack
   env:

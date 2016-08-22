@@ -1,5 +1,5 @@
 {
-  "name": "cf-redis-cloud",
+  "name": "redis-dashboard",
   "version": "0.0.5",
   "description": "admin for cloud foundry redis cloud",
   "repository": {
