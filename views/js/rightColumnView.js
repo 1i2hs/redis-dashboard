@@ -197,17 +197,24 @@ var Row = (function () {
     return Row;
 })();
 
-var showDBInfo = function () {
-    fetchDBInfo().done(function (result) {
+var showServerInfo = function () {
+    showProgressBar("Loading DB data...");
+    fetchServerInfo().done(function (result) {
+        dismissProgressBar();
+        console.log(result);
         $('#page-main-right-column').empty();
-        $('#page-main-right-column').append(templateImport('#db-info-template',
+        $('#page-main-right-column').append(templateImport('#server-info-template',
             {
-                numKeys: result[0],
-                numConnections: result[1],
-                usedMemory: result[2]
+                numConnections: result.connections,
+                usedMemory: result.usedMemory,
+                dbNum: result.dbNum,
+                totalKeys: result.totalKeys,
+                expires: result.expires
             }
         ));
+
     }).fail(function () {
+        dismissProgressBar();
         showNotificationMessage(ALERT_FAILURE, "Fail!", "Fail to get DB info from the server");
     });
 }
@@ -389,7 +396,6 @@ var changeHtmlTemplate = function (keyInfo) {
 
     // refresh button part
     $('.btn-refresh-key-info').on("click", function (event) {
-        showProgressBar("Refreshing key info...");
         refreshKeyInfo(keyInfo.key);
     });
 
@@ -397,10 +403,12 @@ var changeHtmlTemplate = function (keyInfo) {
     confirmButton($('button.btn-delete-key'), function (done) {
         showProgressBar("Deleting key...");
         deleteKey(selectedKey.getKey()).done(function (result) {
+            dismissProgressBar();
             showNotificationMessage(ALERT_SUCCESS, "Success!", "The key [" + selectedKey.getKey() + "] has been deleted successfully.");
             selectedKey.init();
-            refreshKeyListView();
+            refreshKeyListView($('#input-search-key').val());
         }).fail(function () {
+            dismissProgressBar();
             showNotificationMessage(ALERT_SUCCESS, "Fail!", "Fail to delete the key.");
         });
         done();
@@ -410,14 +418,22 @@ var changeHtmlTemplate = function (keyInfo) {
     $('button.btn-save-key').on("click", function (event) {
         var modifiedKeyInfo = createModifiedKeyObject();
 
-        showProgressBar("Saving key info...");
-        saveKey(modifiedKeyInfo).done(function (result) {
-            showNotificationMessage(ALERT_SUCCESS, "Success!", "The key [" + selectedKey.getKey() + "]'s info. has been saved successfully.");
-            refreshKeyInfo(selectedKey.getKey());
-        }).fail(function (jqXHR, textStatu, error) {
-            console.log(textStatus + ": " + error);
-            showNotificationMessage(ALERT_FAILURE, "Fail!", "Fail to save the key's info.");
-        });
+        console.log(modifiedKeyInfo.getValue());
+
+        if (isKeyInfoModified(modifiedKeyInfo)) {
+            showProgressBar("Saving key info...");
+            saveKey(modifiedKeyInfo).done(function (result) {
+                dismissProgressBar();
+                showNotificationMessage(ALERT_SUCCESS, "Success!", "The key [" + selectedKey.getKey() + "]'s info. has been saved successfully.");
+                refreshKeyInfo(selectedKey.getKey());
+            }).fail(function (jqXHR, textStatus, error) {
+                dismissProgressBar();
+                console.log(textStatus + ": " + error);
+                showNotificationMessage(ALERT_FAILURE, "Fail!", "Fail to save the key's info.");
+            });
+        } else {
+            showNotificationMessage(ALERT_FAILURE, "Fail!", "There is no change.");
+        }
     })
 
     // add row button
@@ -454,15 +470,19 @@ var showProgressBar = function (message) {
     ));
 }
 
-var showNoResultMessage = function (keyword) {
+var dismissProgressBar = function () {
+    $('#progressbar-indeterminate').remove();
+}
+
+var showLargeErrorMessage = function (message) {
     $('#page-main-right-column').empty();
 
     var loadingTemplateHeight = $(window).height() - ($('#page-main-right-column').height() + $('#page-bottom').height() + 80);
 
-    $('#page-main-right-column').append(templateImport('#no-result-placeholder-template',
+    $('#page-main-right-column').append(templateImport('#large-error-placeholder-template',
         {
             templateHeight: loadingTemplateHeight,
-            keyword: keyword
+            message: message
         }
     ));
 }
@@ -506,16 +526,18 @@ var enableKeyNameEditor = function (keyInfo) {
         var newKeyName = $('#input-key-name').val();
         showProgressBar("Renaming key...");
         renameKey(selectedKey.getKey(), newKeyName).done(function (result) {
-            console.log(result);
+            dismissProgressBar();
             if (result === "OK") {
                 console.log(result);
                 selectedKey.setKey(newKeyName);
-                refreshKeyListView();
+                // initialize text input in search bar 
+                $('#input-search-key').val("");
+                refreshKeyListView("");
             } else {
                 showNotificationMessage(ALERT_FAILURE, "Fail!", "The key with the given name already exists.");
-                $('#progressbar-indeterminate').remove();
             }
         }).fail(function (jqXHR, textStatus, error) {
+            dismissProgressBar();
             console.log(textStatus + ": " + error);
             if (jqXHR.status === 400) {
                 showNotificationMessage(ALERT_FAILURE, "Fail!", "The key renamed is the same name as before.")
@@ -534,9 +556,12 @@ var disableKeyNameEditor = function (keyInfo) {
 }
 
 var refreshKeyInfo = function (key) {
+    showProgressBar("Refreshing key info...");
     fetchKey(key).done(function (keyInfo) {
+        dismissProgressBar();
         showKeyInfo(keyInfo);
     }).fail(function () {
+        dismissProgressBar();
         showNotificationMessage(ALERT_FAILURE, "Fail!", "Fail to get the key.")
     });
 }
@@ -730,6 +755,7 @@ var deleteRow = function () {
 
     // remove row object from the rows array
     var row = selectedKey.getRow(selectedRowIndex);
+    console.log(selectedRow);
     if (row.getStatus() == ROW_ADDED) {
         selectedKey.getRows().splice(selectedRowIndex, 1);
         currentRowJqueryObject.remove();
@@ -738,6 +764,11 @@ var deleteRow = function () {
             selectedKey.getRow(i).setIndex(i);
         }
     } else {
+        if (selectedKey.getDataType() === "zset") {
+            row.setValue(selectedKey.getValue()[selectedRowIndex * 2]);
+        } else {
+            row.setValue(selectedKey.getValue()[selectedRowIndex]);
+        }
         row.setStatus(ROW_DELETED);
 
         // remove row element from the table
@@ -805,12 +836,13 @@ var createModifiedKeyObject = function () {
             var rows = selectedKey.getRows();
             for (var i = 0; i < rows.length; i++) {
                 var row = rows[i];
+                console.log(row);
                 switch (row.getStatus()) {
                     case ROW_NO_CHANGE:
                         continue;
                     case ROW_ADDED:
                     case ROW_DELETED:
-                        valueSet.push([row.getStatus(), row.getIndex(), changeValueViewFormat(row.getValue(), "Plain Text")]);
+                        valueSet.push([row.getStatus(), changeValueViewFormat(row.getValue(), "Plain Text")]);
                         break;
                     case ROW_MODIFIED:
                         var numberOfRowsTobeDeleted = 0;
@@ -868,7 +900,7 @@ var createModifiedKeyObject = function () {
                         valueSet.push([row.getStatus(), changeValueViewFormat(row.getValue(), "Plain Text")]);
                         break;
                     case ROW_MODIFIED:
-                        valueSet.push([row.getStatus(), selectedKey.getValue()[i * 2 + 1], row.getScore(), changeValueViewFormat(row.getValue(), "Plain Text")]);
+                        valueSet.push([row.getStatus(), selectedKey.getValue()[i * 2], row.getScore(), changeValueViewFormat(row.getValue(), "Plain Text")]);
                         break;
                 }
             }
@@ -900,12 +932,18 @@ var createModifiedKeyObject = function () {
     return modifiedKeyInfo;
 }
 
+var isKeyInfoModified = function (modifiedKeyInfo) {
+    if (modifiedKeyInfo.getDataType() === "string") {
+        return (modifiedKeyInfo.getValue() !== selectedKey.getValue()) || (parseInt(modifiedKeyInfo.getTtl()) !== selectedKey.getTtl());
+    } else {
+        return (modifiedKeyInfo.getValue().length > 0) || (parseInt(modifiedKeyInfo.getTtl()) !== selectedKey.getTtl());
+    }
+}
+
 var adjustInputHeight = function (dataType) {
     var rightColumnDefaultHeight = $('#page-main-left-column').height();
-    console.log(rightColumnDefaultHeight);
 
     var rightColumnHeaderHeight = $('.section-header').height();
-    console.log(rightColumnHeaderHeight);
 
     var valueInputLabelHeight = $('.section-value > div.label-input-value').height();
 

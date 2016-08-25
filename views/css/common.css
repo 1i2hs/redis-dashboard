@@ -1,4 +1,8 @@
 /* global */
+#alert-key-event {
+    display: none;
+}
+
 h1, h2, h3, h4, h5, h6 {
     margin-top: 0px;
     margin-bottom: 0px;
@@ -119,6 +123,7 @@ li.key {
 }
 
 /* for db_info.html */
+h3.server-info-page-title,
 h3.db-info-page-title {
     font-weight: bold;
 }

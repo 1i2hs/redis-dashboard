@@ -52,13 +52,9 @@ var changeValueInputTemplate = function (dataType) {
 
     switch (dataType) {
         case "Sorted set":
-            templates.push("#simple-value-input-template");
+            templates.push("#sorted-set-value-input-template");
             contexts.push({
                 label: "Value"
-            });
-            templates.push("#sorted-set-score-input-template");
-            contexts.push({
-                score: ""
             });
             break;
         case "Hash":
@@ -80,8 +76,47 @@ var changeValueInputTemplate = function (dataType) {
     });
 }
 
+var initDashBoardView = function () {
+    fetchDBList().done(function (result) {
+        console.log(result);
+        $('.btn-change-db > .dropdown > ul.dropdown-menu').empty();
+        $('.btn-change-db > .dropdown > ul.dropdown-menu').append(
+            templateImport('#db-dropdown-list-template', {
+                dbList: result
+            })
+        );
+
+        /* dropdown list to change current DB */
+        $('#btn-home + .btn-change-db > .dropdown > .dropdown-menu > li > a').on("click", function (event) {
+            var dbNum = $(this).text().substring(2);
+
+            showProgressBar("Changing DB...");
+            selectDB(dbNum).done(function (result) {
+                dismissProgressBar();
+                if (result === "OK") {
+                    /* get new key list from newly selected DB */
+                    initDashBoardView();
+                }
+            }).fail(function (err) {
+                dismissProgressBar();
+                showNotificationMessage(ALERT_FAILURE, "Failure!", "Server error. Fail to select the DB");
+            });
+        });
+    });
+
+    /* shows db info page */
+    showServerInfo();
+
+    /* list all keys */
+    searchKey('*').then(function (keys) {
+        configureMainLeftColumnKeyListView(keys);
+    }).fail(function () {
+        showNotificationMessage(ALERT_FAILURE, "Failure!", "Fail to get keys from the server");
+    });
+}
+
 /* temporary global variable */
-var credential = {};
+var token;
 
 $(document).ready(function () {
     /* constants */
@@ -91,14 +126,13 @@ $(document).ready(function () {
     const KEY_LIST_FOOTER_HEIGHT = $('#page-main-left-column > .panel > .panel-footer').height();
     const MIN_KEY_LIST_PANEL_HEIGHT = $(window).height() - (PAGE_TITLE_HEIGHT
         + FILTER_INPUT_HEIGHT + ADD_KEY_BUTTON_HEIGHT + KEY_LIST_FOOTER_HEIGHT + 140); // total margins used in left column === 140
-    
+
     $('#alert-key-event').css("right", $(".container").css("margin-right"));
-    $('#alert-key-event').hide();
 
     /* clicking title("Redis Dashboard") at the top of the page */
-    $('#btn-home > a').on("click", function(event) {
-        window.location.replace(window.location.protocol + "//" + window.location.host + "/?host=" 
-        + credential.host + "&password=" + credential.password + "&port=" + credential.port);
+    $('#btn-home > a').on("click", function (event) {
+        window.location.replace(window.location.protocol + "//" + window.location.host + "/?token="
+            + token);
     });
 
     $('#modal-add-key > .modal-dialog > .modal-content > .modal-footer > button.btn.btn-primary').on("click", function (event) {
@@ -124,7 +158,7 @@ $(document).ready(function () {
         $('.modal-footer > .glyphicon-refresh.small-progress').show();
         addKey(newKeyInfo).done(function (result) {
             if (result === "OK") {
-                refreshKeyListView();
+                refreshKeyListView($('#input-search-key').val());
                 $('#modal-add-key').modal('hide');
                 showNotificationMessage(ALERT_SUCCESS, "Success!", "The key has been added successfully.");
             } else {
@@ -151,6 +185,7 @@ $(document).ready(function () {
     $('.btn-data-type-mgmt > .dropdown > .dropdown-menu > li > a').on("click", function (event) {
         var clickedElement = $(this);
         $('.btn-data-type-mgmt > .dropdown > button').html($(this).text() + "<span class=\"caret\"></span>");
+        console.log($(this).text());
         changeValueInputTemplate($(this).text());
     });
 
@@ -167,28 +202,20 @@ $(document).ready(function () {
             headers: { 'x-socket-io-key': socketKey.key }
         });
 
-        socket.emit('create_redis_client', {
-            host: getParameterByName('host'),
-            password: getParameterByName('password'),
-            port: getParameterByName('port')
-        });
 
-        credential.host = getParameterByName('host');
-        credential.password = getParameterByName('password');
-        credential.port = getParameterByName('port');
+        token = getParameterByName('token');
+
+        socket.emit('create_redis_client', token);
     });
 
-    socket.on('redis_client_created', function () {
-        /* shows db info page */
-        showProgressBar("Loading DB data...");
-        showDBInfo();
+    socket.on('redis_client_created', function (result) {
+        if (result.statusCode === 200) {
+            /* initialize db list */
+            initDashBoardView();
 
-        /* list all keys */
-        searchKey('*').then(function (keys) {
-            configureMainLeftColumnKeyListView(keys);
-        }).fail(function () {
-            showNotificationMessage(ALERT_FAILURE, "Failure!", "Fail to get keys from the server");
-        });
+        } else {
+            showLargeErrorMessage("Invalid Token : unauthorized access");
+        }
     });
 
     $('#page-main-left-column > .panel > .panel-body').height(MIN_KEY_LIST_PANEL_HEIGHT);

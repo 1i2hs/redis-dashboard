@@ -1,3 +1,17 @@
+var fetchDBList = function () {
+    return $.ajax({
+        method: 'GET',
+        url: '/dblist'
+    });
+}
+
+var selectDB = function(dbNum) {
+    return $.ajax({
+        method: 'GET',
+        url: '/dblist/' + dbNum
+    });
+}
+
 var searchKey = function (pattern) {
     return $.ajax({
         method: 'GET',
@@ -13,24 +27,6 @@ var addKey = function (newKeyInfo) {
         data: newKeyInfo
     });
 }
-///////////////////////////////////
-var onKeyAdded = function (result) {
-    if (result === "OK") {
-        refreshKeyListView();
-        $('#modal-add-key').modal('hide');
-        showNotificationMessage(ALERT_SUCCESS, "Success!", "The key has been added successfully.");
-    } else {
-        $('.text-error-message').text("The key with the given name already exists.").show();
-    }
-    $('.modal-footer > .glyphicon-refresh.small-progress').hide();
-}
-
-var onKeyNotAdded = function (jqXHR, textStatus, error) {
-    $('.text-error-message').text(error).show();
-    $('.modal-footer > .glyphicon-refresh.small-progress').hide();
-}
-
-///////////////////////////////////
 
 var fetchKey = function (key) {
     return $.ajax({
@@ -39,21 +35,6 @@ var fetchKey = function (key) {
         dataType: "json"
     })
 }
-
-
-/////////////////////////////////
-//TODO later
-var onKeyFetched = function (keyInfo) {
-    selectedKey.setKey(keyPageData.key);
-    selectedKey.setDataType(keyPageData.dataType);
-    selectedKey.setValue(keyPageData.value);
-    selectedKey.setTtl(keyPageData.ttl);
-}
-
-var onKeyNotFetched = function () {
-    showNotificationMessage(ALERT_FAILURE, "Fail!", "Fail to get the keys.")
-}
-/////////////////////////////////
 
 var saveKey = function (modifiedKeyInfo) {
     return $.ajax({
@@ -74,36 +55,12 @@ var saveKey = function (modifiedKeyInfo) {
     });
 }
 
-////////////////////////////////////////
-var onKeySaved = function (result) {
-    console.log(result);
-    showNotificationMessage(ALERT_SUCCESS, "Success!", "The key's info. has been saved successfully.");
-}
-
-var onKeyNotSaved = function () {
-    console.log(textStatus + ": " + error);
-    showNotificationMessage(ALERT_SUCCESS, "Failure!", "Fail to save the key's info.");
-}
-////////////////////////////////////////
-
 var deleteKey = function (key) {
     return $.ajax({
         method: "DELETE",
         url: "/keys/" + key,
     });
 }
-///////////////////////////////////////
-var onKeyDeleted = function (result) {
-    console.log(result);
-    showNotificationMessage(ALERT_SUCCESS, "Success!", "The key has been deleted successfully.");
-}
-
-var onKeyNotDeleted = function (jqXHR, textStatus, error) {
-    console.log(textStatus + ": " + error);
-    showNotificationMessage(ALERT_SUCCESS, "Failure!", "Fail to delete the key.");
-}
-
-////////////////////////////////////////
 
 var renameKey = function (keyName, newKeyName) {
     return $.ajax({
@@ -113,22 +70,10 @@ var renameKey = function (keyName, newKeyName) {
     });
 }
 
-///////////////////////////////////////////
-var onKeyRenamed = function (result) {
-    console.log(result);
-    selectedKey.setKey(newKeyName);
-    refreshKeyListView();
-    refreshKeyInfo();
-}
-
-var onKeyNotRenamed = function (jqXHR, textStatus, error) {
-    console.log(textStatus + ": " + error);
-}
-///////////////////////////////////////////
-
-var fetchDBInfo = function () {
+var fetchServerInfo = function () {
     return $.ajax({
         method: 'GET',
-        url: '/dbinfo',
+        url: '/serverinfo',
+        dataType: "json"
     });
 }

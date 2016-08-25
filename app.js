@@ -65,8 +65,20 @@ app.use('/views', express.static(_path.views));
 app.use(session({
 	secret: 'cf-redis',
 	resave: false,
-	saveUninitialized: true
+	saveUninitialized: true,
+	cookie: {
+		expires: new Date(Date.now() + 180 * 10000),
+		maxAge: 180 * 10000
+	}
 }));
+
+app.use(function (req, res, next) {
+	if (!req.session) {
+		req.session = {};
+	}
+	next();
+});
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(methodOverride());
@@ -97,9 +109,6 @@ process.on('uncaughtException', function (err) {
 	console.error('=================================================\n\n');
 });
 
-/**
- * set socket io
- */
 String.prototype.hexEncode = function () {
 	var hex, i;
 

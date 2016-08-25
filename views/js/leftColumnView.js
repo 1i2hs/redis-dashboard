@@ -14,8 +14,10 @@ var configureMainLeftColumnKeyListView = function (keys) {
 
                 showProgressBar("Key info. loading...");
                 fetchKey(key).done(function (keyInfo) {
+                    dismissProgressBar();
                     showKeyInfo(keyInfo);
                 }).fail(function () {
+                    dismissProgressBar();
                     showNotificationMessage(ALERT_FAILURE, "Fail!", "Fail to get the key.")
                 });
             });
@@ -31,25 +33,24 @@ var configureNumberOfKeysView = function (numKeys) {
     $('#page-main-left-column > div.panel.panel-default > div.panel-footer').text(numKeys + "keys");
 }
 
-var refreshKeyListView = function () {
-    var userInputKeyPattern = $('#input-search-key').val();
+var refreshKeyListView = function (userInputKeyPattern) {
     var currentKeyPattern = "*" + userInputKeyPattern + "*";
 
     showProgressBar("Refreshing keys...");
 
     searchKey(currentKeyPattern).done(function (keys) {
+        dismissProgressBar();
         configureMainLeftColumnKeyListView(keys);
         if (selectedKey.getKey()) {
             var selectedKeyId = "#redisKey-" + selectedKey.getKey().hexEncode();
             $(selectedKeyId).trigger("click");
         } else {
             // todo modify the function
-            showDBInfo();
+            showServerInfo();
         }
-        $('#progressbar-indeterminate').remove();
     }).fail(function () {
+        dismissProgressBar();
         showNotificationMessage(ALERT_FAILURE, "Failure!", "Fail to get the keys with the " + userInputKeyPattern);
-        $('#progressbar-indeterminate').remove();
     });
 }
 
@@ -58,10 +59,11 @@ $(document).ready(function () {
         var userInputKeyPattern = $('#input-search-key').val();
         showProgressBar("Searching for " + userInputKeyPattern + "...");
         searchKey("*" + userInputKeyPattern + "*").done(function (keys) {
+            dismissProgressBar();
             configureMainLeftColumnKeyListView(keys);
             if (keys.length === 0) {
                 console.log("no keys found");
-                showNoResultMessage(userInputKeyPattern);
+                showLargeErrorMessage("No keys found for the word : " + userInputKeyPattern);
                 return;
             }
 
@@ -69,10 +71,10 @@ $(document).ready(function () {
                 var selectedKeyId = "#redisKey-" + selectedKey.getKey().hexEncode();
                 $(selectedKeyId).trigger("click");
             } else {
-                /////////////////////
-                showDBInfo();
+                showServerInfo();
             }
         }).fail(function () {
+            dismissProgressBar();
             showNotificationMessage(ALERT_FAILURE, "Failure!", "Fail to get the keys with the [" + userInputKeyPattern + "]");
         })
     });
@@ -87,6 +89,6 @@ $(document).ready(function () {
 
     // refresh key list button
     $('#page-main-left-column > #btn-refresh-key-list').on("click", function (event) {
-        refreshKeyListView();
+        refreshKeyListView($('#input-search-key').val());
     });
 });

@@ -8,11 +8,13 @@
   },
   "main": "app.js",
   "dependencies": {
+    "assert": "^1.4.1",
     "bluebird": "^3.4.1",
     "body-parser": "*",
     "express": "*",
     "express-session": "^1.14.0",
     "method-override": "*",
+    "node-uuid": "^1.4.7",
     "nodejs-imp": "*",
     "redis": "^2.6.2",
     "socket.io": "^1.4.8"
