@@ -243,11 +243,12 @@ module.exports = (function () {
     };
 
     RedisClient.prototype.getDBList = function (req, res) {
+        this.log("[Info] counting number of DBs...");
         countDB(this, 0, res);
     };
 
     var countDB = function (thisArg, dbNum, res) {
-        thisArg.log(">>> [Command] select " + dbNum);
+        thisArg.log("[Command] select " + dbNum);
         thisArg.client.select(dbNum, function (err, result) {
             if (!err) {
                 countDB(thisArg, ++dbNum, res);
