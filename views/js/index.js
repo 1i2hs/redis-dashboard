@@ -116,8 +116,8 @@ var initDashBoardView = function () {
             /* list all keys */
             showProgressBar("Fetching keys...");
             searchKey('*').then(function (keys) {
-                dismissProgressBar();
                 configureMainLeftColumnKeyListView(keys);
+                dismissProgressBar();
             }).fail(function () {
                 dismissProgressBar();
                 showNotificationMessage(ALERT_FAILURE, "Failure!", "Fail to get keys from the server");

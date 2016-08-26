@@ -31,7 +31,7 @@ var addKey = function (newKeyInfo) {
 var fetchKey = function (key) {
     return $.ajax({
         method: "GET",
-        url: "/keys/" + key,
+        url: "/keys/" + encodeURIComponent(key),
         dataType: "json"
     })
 }

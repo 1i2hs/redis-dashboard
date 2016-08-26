@@ -127,11 +127,23 @@ module.exports = function (app, io) {
 
 			console.log("[Info] Credentials : ", credentials);
 
-			if (!credentials) {
-				//잘못된 토큰으로 접속한경우.
-				socket.emit('redis_client_created', { statusCode: 401 });
-			}
-			else {
+			credentials = {
+				host: "pub-redis-13865.us-east-1-4.6.ec2.redislabs.com",
+				password: "MOIF1VuVGaoCn3hV",
+				port: "13865"
+			};
+
+			// credentials = {
+			// 	host: "redis.ghama.io",
+			// 	password: "15269975-67a0-4bc7-8cca-619c38f1352e",
+			// 	port: "36220"
+			// };
+
+			// if (!credentials) {
+			// 	//잘못된 토큰으로 접속한경우.
+			// 	socket.emit('redis_client_created', { statusCode: 401 });
+			// }
+			// else {
 				//credentials 활용.
 				redisClient[socketKey] = new RedisClient(socket, credentials.host, credentials.port, credentials.password);
 
@@ -141,7 +153,7 @@ module.exports = function (app, io) {
 						+ "     WELCOME TO REDIS DASHBOARD     " + "====================================");
 					redisClient[socketKey].log(" connected to Redis server...");
 				});
-			}
+			// }
 		});
 
 		socket.on('disconnect', function () {

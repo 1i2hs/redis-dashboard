@@ -336,12 +336,30 @@ module.exports = (function () {
             replies.forEach(function (reply, index) {
                 that.log("[Reply]" + "[" + index + "] " + reply);
                 if (index === 0) {
-                    keyInfo.value = reply;
-                } else if (index === 1) {
+                    if (keyInfo.dataType !== "string" && keyInfo.dataType !== "hash") {
+                        var temp = [];
+
+                        for (var i = 0; i < reply.length; i++) {
+                            while (reply[i].charCodeAt(0) == 65533)
+                                reply[i] = reply[i].substring(1, reply[i].length);
+
+                            console.log(reply[i]);
+
+                            temp.push(reply[i]);
+                        }
+
+                        keyInfo.value = temp;
+                    }
+                    else {
+                        keyInfo.value = reply;
+                    }
+                }
+
+                if (index === 1) {
                     keyInfo.ttl = reply;
                 }
             });
-            console.log(keyInfo.value);
+
             res.status(200).send(JSON.stringify(keyInfo));
             return;
         }).catch(function (err) {
