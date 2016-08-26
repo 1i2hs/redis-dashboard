@@ -12,8 +12,6 @@ module.exports = (function () {
     const VALUE_DELETED = 1;
     const VALUE_MODIFIED = 2;
 
-    var currentDBNum = 0;
-
     String.prototype.hexEncode = function () {
         var hex, i;
 
@@ -180,6 +178,7 @@ module.exports = (function () {
     }
 
     var RedisClient = function (socket, host, port, password) {
+        this.currentDBNum = 0;
         this.socket = socket;
         this.host = host;
         this.port = port;
@@ -243,50 +242,42 @@ module.exports = (function () {
         });
     };
 
+    RedisClient.prototype.getDBList = function (req, res) {
+        countDB(this, 0, res);
+    };
+
+    var countDB = function (thisArg, dbNum, res) {
+        thisArg.log(">>> [Command] select " + dbNum);
+        thisArg.client.select(dbNum, function (err, result) {
+            if (!err) {
+                countDB(thisArg, ++dbNum, res);
+            } else {
+                res.send({ totalDBNum: dbNum });
+            }
+        });
+    }
+
     RedisClient.prototype.getServerInfo = function (req, res) {
         var that = this;
         this.client.info(function (err, result) {
-            that.log("[Info] Current db : db", currentDBNum);
+            that.log("[Info] Current db : db", that.currentDBNum);
             res.send({
                 connections: that.client.server_info.connected_clients,
                 usedMemory: that.client.server_info.used_memory_human,
-                dbNum: currentDBNum,
-                totalKeys: (typeof that.client.server_info["db" + currentDBNum] === 'undefined') ? 0 : that.client.server_info["db" + currentDBNum].keys,
-                expires: (typeof that.client.server_info["db" + currentDBNum] === 'undefined') ? 0 : that.client.server_info["db" + currentDBNum].expires
+                dbNum: that.currentDBNum,
+                totalKeys: (typeof that.client.server_info["db" + that.currentDBNum] === 'undefined') ? 0 : that.client.server_info["db" + that.currentDBNum].keys,
+                expires: (typeof that.client.server_info["db" + that.currentDBNum] === 'undefined') ? 0 : that.client.server_info["db" + that.currentDBNum].expires
             });
             return;
         });
     };
-
-    RedisClient.prototype.getDBList = function (req, res) {
-        var dbList = [];
-        var that = this;
-        this.log("[Command] info keyspace ");
-        this.client.info("keyspace", function (err, result) {
-            if (!err) {
-                var dbs = result.split("\n");
-                var db;
-                for (db = 1; db < dbs.length - 1; db++) {
-                    var dbNum = parseInt(dbs[db].split(":")[0].substring(2));
-                    dbList.push({
-                        dbNum: dbNum
-                    });
-                }
-                res.send(dbList);
-            } else {
-                that.log("[ERR] " + err);
-                res.status(503).send(err);
-            }
-            return;
-        });
-    }
 
     RedisClient.prototype.selectDB = function (dbNum, req, res) {
         var that = this;
         this.log("[Command] select " + dbNum);
         this.client.select(dbNum, function (err, result) {
             if (!err) {
-                currentDBNum = dbNum;
+                that.currentDBNum = dbNum;
                 that.log("[Reply] " + result);
                 res.status(200).send("OK");
             } else {
@@ -349,7 +340,7 @@ module.exports = (function () {
                     keyInfo.ttl = reply;
                 }
             });
-
+            console.log(keyInfo.value);
             res.status(200).send(JSON.stringify(keyInfo));
             return;
         }).catch(function (err) {

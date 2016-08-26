@@ -215,7 +215,7 @@ var showServerInfo = function () {
 
     }).fail(function () {
         dismissProgressBar();
-        showNotificationMessage(ALERT_FAILURE, "Fail!", "Fail to get DB info from the server");
+        showNotificationMessage(ALERT_FAILURE, "Fail!", "Fail to get server info from the server");
     });
 }
 
@@ -242,12 +242,12 @@ var showKeyInfo = function (keyInfo) {
     selectedKey.setCurrentRow(null);
     selectedKey.setRows(null);
 
-    changeHtmlTemplate(keyInfo);
+    changeHtmlTemplateAndShowData(keyInfo);
 
     adjustInputHeight(keyInfo.dataType);
 }
 
-var changeHtmlTemplate = function (keyInfo) {
+var changeHtmlTemplateAndShowData = function (keyInfo) {
     $('#page-main-right-column').empty();
     var templates = ["#key-info-header-template"];
     var contexts = [];
@@ -489,6 +489,12 @@ var showLargeErrorMessage = function (message) {
 
 var changeValueViewFormat = function (value, type) {
     var formattedValue = value;
+
+    // check the input text is just a string with digits
+    if(/^\d+$/.test(formattedValue)) {
+        return formattedValue;
+    }
+
     try {
         var obj = JSON.parse(value);
         switch (type) {

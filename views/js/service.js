@@ -1,7 +1,7 @@
-var fetchDBList = function () {
+var fetchDBList = function() {
     return $.ajax({
         method: 'GET',
-        url: '/dblist'
+        url: '/dbList'
     });
 }
 

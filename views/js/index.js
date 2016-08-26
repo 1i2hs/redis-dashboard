@@ -77,21 +77,27 @@ var changeValueInputTemplate = function (dataType) {
 }
 
 var initDashBoardView = function () {
+    showProgressBar("Fetching DB list...");
     fetchDBList().done(function (result) {
         console.log(result);
+        showProgressBar("Changing DB...");
         $('.btn-change-db > .dropdown > ul.dropdown-menu').empty();
-        $('.btn-change-db > .dropdown > ul.dropdown-menu').append(
-            templateImport('#db-dropdown-list-template', {
-                dbList: result
-            })
-        );
+        // 16 is the default number of DBs inside redis server
+        for (var i = 0; i < result.totalDBNum; i++) {
+            $('.btn-change-db > .dropdown > ul.dropdown-menu').append(
+                templateImport('#db-dropdown-list-template', {
+                    dbNum: i
+                })
+            );
+        }
 
         /* dropdown list to change current DB */
         $('#btn-home + .btn-change-db > .dropdown > .dropdown-menu > li > a').on("click", function (event) {
-            var dbNum = $(this).text().substring(2);
+            _currentDBNum = $(this).text().substring(2);
 
             showProgressBar("Changing DB...");
-            selectDB(dbNum).done(function (result) {
+            selectDB(_currentDBNum).done(function (result) {
+                $('#btn-home + .btn-change-db > .dropdown > .btn-default').html("db" + _currentDBNum + "<span class=\"caret\"></span>");
                 dismissProgressBar();
                 if (result === "OK") {
                     /* get new key list from newly selected DB */
@@ -102,21 +108,33 @@ var initDashBoardView = function () {
                 showNotificationMessage(ALERT_FAILURE, "Failure!", "Server error. Fail to select the DB");
             });
         });
-    });
 
-    /* shows db info page */
-    showServerInfo();
+        /* shows db info page */
+        selectDB(_currentDBNum).done(function (result) {
+            showServerInfo();
 
-    /* list all keys */
-    searchKey('*').then(function (keys) {
-        configureMainLeftColumnKeyListView(keys);
-    }).fail(function () {
-        showNotificationMessage(ALERT_FAILURE, "Failure!", "Fail to get keys from the server");
+            /* list all keys */
+            showProgressBar("Fetching keys...");
+            searchKey('*').then(function (keys) {
+                dismissProgressBar();
+                configureMainLeftColumnKeyListView(keys);
+            }).fail(function () {
+                dismissProgressBar();
+                showNotificationMessage(ALERT_FAILURE, "Failure!", "Fail to get keys from the server");
+            });
+        }).fail(function (err) {
+            dismissProgressBar();
+            showNotificationMessage(ALERT_FAILURE, "Failure!", "Fail to select db0");
+        });
+    }).fail(function (err) {
+        dismissProgressBar();
+        showNotificationMessage(ALERT_FAILURE, "Failure!", "Server error. Fail to fetch the DB list");
     });
 }
 
 /* temporary global variable */
-var token;
+var _token;
+var _currentDBNum = "0";
 
 $(document).ready(function () {
     /* constants */
@@ -132,7 +150,7 @@ $(document).ready(function () {
     /* clicking title("Redis Dashboard") at the top of the page */
     $('#btn-home > a').on("click", function (event) {
         window.location.replace(window.location.protocol + "//" + window.location.host + "/?token="
-            + token);
+            + _token);
     });
 
     $('#modal-add-key > .modal-dialog > .modal-content > .modal-footer > button.btn.btn-primary').on("click", function (event) {
@@ -203,9 +221,9 @@ $(document).ready(function () {
         });
 
 
-        token = getParameterByName('token');
+        _token = getParameterByName('token');
 
-        socket.emit('create_redis_client', token);
+        socket.emit('create_redis_client', _token);
     });
 
     socket.on('redis_client_created', function (result) {

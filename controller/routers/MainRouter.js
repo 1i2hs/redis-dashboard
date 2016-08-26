@@ -80,17 +80,6 @@ module.exports = function (app, io) {
 		client.getKeys(pattern, req, res);
 	});
 
-	// app.post('/keys', function (req, res, next) {
-	// 	var key = req.body.key;
-	// 	var dataType = req.body.dataType;
-	// 	var value = req.body.value;
-
-	// 	var socketKey = req.get('x-socket-io-key');
-
-	// 	var client = redisClient[req.get('x-socket-io-key')];
-	// 	client.addKey(key, value, dataType, req, res);
-	// });
-
 	app.post('/keys', function (req, res, next) {
 		var key = req.body.key;
 		var dataType = req.body.dataType;
@@ -138,26 +127,21 @@ module.exports = function (app, io) {
 
 			console.log("[Info] Credentials : ", credentials);
 
-			credentials = {
-				host: "pub-redis-13865.us-east-1-4.6.ec2.redislabs.com",
-				password: "MOIF1VuVGaoCn3hV",
-				port: "13865"
-			};
-			// if (!credentials) {
-			// 	//잘못된 토큰으로 접속한경우.
-			// 	socket.emit('redis_client_created', { statusCode: 401 });
-			// }
-			// else {
-			//credentials 활용.
-			redisClient[socketKey] = new RedisClient(socket, credentials.host, credentials.port, credentials.password);
+			if (!credentials) {
+				//잘못된 토큰으로 접속한경우.
+				socket.emit('redis_client_created', { statusCode: 401 });
+			}
+			else {
+				//credentials 활용.
+				redisClient[socketKey] = new RedisClient(socket, credentials.host, credentials.port, credentials.password);
 
-			redisClient[socketKey].client.on('ready', function () {
-				socket.emit('redis_client_created', { statusCode: 200 });
-				redisClient[socketKey].log("===================================="
-					+ "     WELCOME TO REDIS DASHBOARD     " + "====================================");
-				redisClient[socketKey].log(" connected to Redis server...");
-			});
-			// }
+				redisClient[socketKey].client.on('ready', function () {
+					socket.emit('redis_client_created', { statusCode: 200 });
+					redisClient[socketKey].log("===================================="
+						+ "     WELCOME TO REDIS DASHBOARD     " + "====================================");
+					redisClient[socketKey].log(" connected to Redis server...");
+				});
+			}
 		});
 
 		socket.on('disconnect', function () {
