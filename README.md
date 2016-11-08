@@ -7,7 +7,7 @@ redis-dashboard is a client dashboard for redis.
 >if the file does not exist, you must create the file in the root directory. 
 
     applications:
-    name: swift-portal
+    name: redis-dashboard
     command: node app.js
     buildpack: nodejs_buildpack
     env:
